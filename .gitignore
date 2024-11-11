@@ -1,0 +1,8 @@
+# MacOS specific files
+*.DS_Store
+
+# backend
+env
+keys.json
+db.sqlite3
+notes.txt
