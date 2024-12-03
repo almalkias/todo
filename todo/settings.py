@@ -174,7 +174,7 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DOMAIN = '127.0.0.1:3000'  # Your frontend domain without http/https
+DOMAIN = getKey("EMAIL_DOMAIN", '')  # Your frontend domain without http/https
 SITE_NAME = 'To Do'  # The name that appears in the email
 
 DJOSER = {
