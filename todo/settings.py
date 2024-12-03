@@ -51,7 +51,8 @@ ALLOWED_HOSTS = []
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
-    'http://localhost:3000'
+    'http://localhost:3000', 
+    'https://almalkias.pythonanywhere.com/'
 ]
 
 
@@ -185,10 +186,9 @@ DJOSER = {
 }
 
 EMAIL_BACKEND = getKey("EMAIL_BACKEND", '')
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'almalkias892@gmail.com'
-# EMAIL_HOST_PASSWORD = 'tdby vflr phgl ffqg'
-# DEFAULT_FROM_EMAIL = 'To Do'
+EMAIL_HOST = getKey("EMAIL_HOST", '')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = getKey("EMAIL_HOST_USER", '')
+EMAIL_HOST_PASSWORD = getKey("EMAIL_HOST_PASSWORD", '')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
