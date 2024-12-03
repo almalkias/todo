@@ -25,9 +25,10 @@ if ENVIRONMENT == 'production':
 else:
     keys_file = str(BASE_DIR)+"/keys.json"
 
-# Load the selected keys file
+# Open the JSON file and read its contents
 with open(keys_file) as f:
-    project_keys = json.loads(f.read())
+    project_keys = json.loads(f.read()) # Converts JSON string to dictionary
+
 
 # Function to retrieve keys
 def getKey(setting, default=None):

@@ -6,12 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class TaskListCreateView(generics.ListCreateAPIView):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Task.objects.filter(category__user=self.request.user)
+        return Task.objects.filter(user=self.request.user).order_by('is_completed', '-updated_at')
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -19,7 +21,9 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Task.objects.filter(category__user=self.request.user)
+        return Task.objects.filter(user=self.request.user)
+
+
 
 
 class CategoryListCreateView(generics.ListCreateAPIView):
@@ -28,10 +32,12 @@ class CategoryListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Category.objects.filter(user=self.request.user).prefetch_related('tasks')
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
 

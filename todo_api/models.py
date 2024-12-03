@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -26,10 +26,10 @@ class Task(models.Model):
     
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    is_completed = models.BooleanField(default=False)
     due_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_completed = models.BooleanField(default=False)
     priority = models.CharField(
         max_length=1,
         choices=PRIORITY_CHOICES,
@@ -38,10 +38,9 @@ class Task(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
-        default=1,
-        null= True,
         related_name='tasks'
     )
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title

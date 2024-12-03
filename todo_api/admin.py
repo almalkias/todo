@@ -20,9 +20,13 @@ class CustomUserAdmin(UserAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'is_completed', 'priority', 'category', 'created_at', 'updated_at')
+    list_display = ('title', 'user', 'is_completed', 'priority', 'category', 'created_at', 'updated_at')
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'user')
 
 
 admin.site.register(Task, TaskAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Category)
+admin.site.register(Category, CategoryAdmin)
