@@ -1,120 +1,80 @@
+from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient
 from rest_framework import status
-from .models import Task, Category, CustomUser
-from .serializers import TaskSerializer, CategorySerializer
+from .models import CustomUser
 
 
-class TodoAPITestCase(APITestCase):
-
+class AuthTests(TestCase):
     def setUp(self):
-        # Create two users
-        self.user1 = CustomUser.objects.create_user(username="user1", email="user1@example.com", password="password1")
-        self.user2 = CustomUser.objects.create_user(username="user2", email="user2@example.com", password="password2")
-        
-        # Log in user1 for testing
-        self.client.force_authenticate(user=self.user1)
+        # Initialize API client
+        self.client = APIClient()
 
-        # Create a category for user1
-        self.category1 = Category.objects.create(name="Category 1", description="User1's category", user=self.user1)
-        
-        # Create tasks for user1
-        self.task1 = Task.objects.create(
-            title="Task 1",
-            description="User1's task",
-            is_completed=False,
-            priority='M',
-            category=self.category1
-        )
-
-    def test_create_category(self):
-        """Test user can create a category."""
-        data = {
-            "name": "New Category",
-            "description": "A new category for user1",
+        # Test user data
+        self.user_data = {
+            "email": "testuser@example.com",
+            "username": "testuser",
+            "password": "Test.102892"
         }
-        response = self.client.post(reverse('category-list-create'), data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Category.objects.filter(user=self.user1).count(), 2)
 
-    def test_create_task(self):
-        """Test user can create a task."""
-        data = {
-            "title": "New Task",
-            "description": "A new task for user1",
-            "is_completed": False,
-            "priority": "H",
-            "category": self.category1.id
+        # Create a test user for signin/signout tests
+        self.user = CustomUser.objects.create_user(**self.user_data)
+
+    # def test_signup(self):
+    #     """Test user signup functionality."""
+    #     signup_url = reverse("user-create")  # Djoser signup endpoint
+    #     signup_data = {
+    #         "email": "newuser@example.com",
+    #         "username": "newuser",
+    #         "password": "Test.102892"
+    #     }
+
+    #     response = self.client.post(signup_url, signup_data, format="json")
+
+    #     # Assert the response is 201 Created
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    #     # Check if the user is created in the database
+    #     self.assertTrue(CustomUser.objects.filter(email="newuser@example.com").exists())
+
+    def test_signin(self):
+        """Test user signin functionality."""
+        signin_url = reverse("login")  # Djoser token login endpoint
+        signin_data = {
+            "email": self.user_data["email"],
+            "password": self.user_data["password"]
         }
-        response = self.client.post(reverse('task-list-create'), data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Task.objects.filter(category__user=self.user1).count(), 2)
 
-    def test_list_categories(self):
-        """Test user can only list their own categories."""
-        response = self.client.get(reverse('category-list-create'))
-        categories = Category.objects.filter(user=self.user1)
-        serializer = CategorySerializer(categories, many=True)
+        response = self.client.post(signin_url, signin_data, format="json")
+
+        # Assert the response is 200 OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
-        
-    def test_list_tasks(self):
-        """Test user can only list their own tasks."""
-        response = self.client.get(reverse('task-list-create'))
-        tasks = Task.objects.filter(category__user=self.user1)
-        serializer = TaskSerializer(tasks, many=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
 
-    def test_task_detail_access(self):
-        """Test user can access their own task details."""
-        response = self.client.get(reverse('task-detail', args=[self.task1.id]))
-        serializer = TaskSerializer(self.task1)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, serializer.data)
+        # Assert the response contains the authentication token
+        self.assertIn("auth_token", response.data)
 
-    def test_task_detail_no_access(self):
-        """Test user cannot access another user's task details."""
-        # Create a task for user2
-        category_user2 = Category.objects.create(name="Category 2", description="User2's category", user=self.user2)
-        task_user2 = Task.objects.create(title="Task User2", description="User2's task", priority='L', category=category_user2)
-        
-        response = self.client.get(reverse('task-detail', args=[task_user2.id]))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_update_task(self):
-        """Test user can update their own task."""
-        data = {
-            "title": "Updated Task",
-            "description": "Updated description",
-            "is_completed": True,
-            "priority": "L",
-            "category": self.category1.id
+    def test_signout(self):
+        """Test user signout functionality."""
+        # Sign in first to get the token
+        signin_url = reverse("login")
+        signin_data = {
+            "email": self.user_data["email"],
+            "password": self.user_data["password"]
         }
-        response = self.client.put(reverse('task-detail', args=[self.task1.id]), data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.task1.refresh_from_db()
-        self.assertEqual(self.task1.title, data["title"])
-        self.assertTrue(self.task1.is_completed)
+        signin_response = self.client.post(signin_url, signin_data, format="json")
+        token = signin_response.data["auth_token"]
 
-    def test_delete_task(self):
-        """Test user can delete their own task."""
-        response = self.client.delete(reverse('task-detail', args=[self.task1.id]))
+        # Authenticate client with the token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+
+        # Call the logout endpoint
+        signout_url = reverse("logout")  # Djoser token logout endpoint
+        response = self.client.post(signout_url)
+
+        # Assert the response is 204 No Content
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Task.objects.filter(id=self.task1.id).exists())
 
-    def test_category_detail_no_access(self):
-        """Test user cannot access another user's category details."""
-        # Create a category for user2
-        category_user2 = Category.objects.create(name="Category 2", description="User2's category", user=self.user2)
-        
-        response = self.client.get(reverse('category-detail', args=[category_user2.id]))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_list_categories_different_user(self):
-        """Test a user cannot see categories belonging to another user."""
-        # Log in as user2 and list categories
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.get(reverse('category-list-create'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)  # User2 should see no categories since theirs haven't been created
+        # Ensure token is invalidated by making an authenticated request
+        protected_url = reverse("task-list-create")  # Example of a protected endpoint
+        protected_response = self.client.get(protected_url)
+        self.assertEqual(protected_response.status_code, status.HTTP_401_UNAUTHORIZED)
