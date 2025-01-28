@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Task, Category
+from .models import CustomUser, Task, Category, UserProfile
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -30,3 +30,4 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Task, TaskAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(UserProfile)

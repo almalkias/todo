@@ -9,6 +9,17 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="profile")
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    telephone = models.CharField(max_length=15, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
