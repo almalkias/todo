@@ -6,4 +6,3 @@ env
 keys.json
 db.sqlite3
 notes.txt
-/static/
