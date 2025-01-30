@@ -16,4 +16,5 @@ EXPOSE 8000
 
 # Start the application using Gunicorn (for production)
 # CMD ["gunicorn", "todo.wsgi:application", "--bind", "0.0.0.0:8000"]
-CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 todo.wsgi:application"]
+# CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 todo.wsgi:application"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 todo.wsgi:application"]
