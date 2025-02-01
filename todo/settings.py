@@ -47,7 +47,7 @@ SECRET_KEY = getKey("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getKey('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = ['almalkias.pythonanywhere.com', '127.0.0.1', 'todo-peg9.onrender.com']
+ALLOWED_HOSTS = ['almalkias.pythonanywhere.com', '127.0.0.1', 'todo-v1-zhz8.onrender.com']
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
