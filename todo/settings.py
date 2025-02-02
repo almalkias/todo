@@ -13,39 +13,24 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import json
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Determine the environment and select the appropriate keys file
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+load_dotenv(BASE_DIR / ".env")
 
-if ENVIRONMENT == 'production':
-    keys_file = str(BASE_DIR)+"/keys.production.json"
-else:
-    keys_file = str(BASE_DIR)+"/keys.json"
-
-# Open the JSON file and read its contents
-with open(keys_file) as f:
-    project_keys = json.loads(f.read()) # Converts JSON string to dictionary
-
-
-# Function to retrieve keys
-def getKey(setting, default=None):
-    if isinstance(project_keys, dict):
-        return project_keys.get(setting, default)
-    else:
-        raise TypeError("project_keys should be a dictionary")
-
+def get_env_var(var_name, default=None):
+    return os.getenv(var_name, default)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = getKey("DJANGO_SECRET_KEY")
+SECRET_KEY = get_env_var("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getKey('DJANGO_DEBUG')
+DEBUG = get_env_var('DJANGO_DEBUG')
 
 ALLOWED_HOSTS = ['almalkias.pythonanywhere.com', '127.0.0.1', 'todo-v1-zhz8.onrender.com']
 
@@ -120,12 +105,12 @@ WSGI_APPLICATION = 'todo.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': getKey('DJANGO_DB_ENGINE'),
-        'NAME': getKey('DJANGO_DB_NAME'),
-        'USER': getKey('DJANGO_DB_USER', ''),
-        'PASSWORD': getKey('DJANGO_DB_PASSWORD', ''),
-        'HOST': getKey('DJANGO_DB_HOST', ''),
-        'PORT': getKey('DJANGO_DB_PORT', ''),
+        'ENGINE': get_env_var('DJANGO_DB_ENGINE'),
+        'NAME': get_env_var('DJANGO_DB_NAME'),
+        'USER': get_env_var('DJANGO_DB_USER', ''),
+        'PASSWORD': get_env_var('DJANGO_DB_PASSWORD', ''),
+        'HOST': get_env_var('DJANGO_DB_HOST', ''),
+        'PORT': get_env_var('DJANGO_DB_PORT', ''),
     }
 }
 
@@ -175,7 +160,7 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DOMAIN = getKey("EMAIL_DOMAIN", '')  # Your frontend domain without http/https
+DOMAIN = get_env_var("EMAIL_DOMAIN")  # Your frontend domain without http/https
 SITE_NAME = 'To Do'  # The name that appears in the email
 
 DJOSER = {
@@ -187,12 +172,10 @@ DJOSER = {
     'SITE_NAME': SITE_NAME
 }
 
-EMAIL_BACKEND = getKey("EMAIL_BACKEND", '')
-EMAIL_HOST = getKey("EMAIL_HOST", '')
+EMAIL_BACKEND = get_env_var("EMAIL_BACKEND")
+EMAIL_HOST = get_env_var("EMAIL_HOST")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = getKey("EMAIL_HOST_USER", '')
-EMAIL_HOST_PASSWORD = getKey("EMAIL_HOST_PASSWORD", '')
+EMAIL_HOST_USER = get_env_var("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = get_env_var("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-# test 7
