@@ -30,7 +30,7 @@ def get_env_var(var_name, default=None):
 SECRET_KEY = get_env_var("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_env_var('DJANGO_DEBUG')
+DEBUG = get_env_var('DJANGO_DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['almalkias.pythonanywhere.com', '127.0.0.1', 'todo-v1-zhz8.onrender.com']
 
