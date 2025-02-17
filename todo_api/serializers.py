@@ -4,6 +4,26 @@ import re
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    def validate_first_name(self, value):
+        if value and not re.match(r'^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FFa-zA-Z\s]+$', value):
+            raise serializers.ValidationError("First name must contain only letters (Arabic or English).")
+        return value
+
+    def validate_last_name(self, value):
+        if value and not re.match(r'^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FFa-zA-Z\s]+$', value):
+            raise serializers.ValidationError("Last name must contain only letters (Arabic or English).")
+        return value
+
+    def validate_city(self, value):
+        if value and not re.match(r'^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FFa-zA-Z\s]+$', value):
+            raise serializers.ValidationError("City must contain only letters (Arabic or English).")
+        return value
+
+    def validate_telephone(self, value):
+        if value and not re.match(r'^\d+$', value):  # Only digits allowed
+            raise serializers.ValidationError("Telephone must contain only numbers.")
+        return value
+
     class Meta:
         model = UserProfile
         fields = ['first_name', 'last_name', 'telephone', 'city']

@@ -32,7 +32,7 @@ SECRET_KEY = get_env_var("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_env_var('DJANGO_DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['almalkias.pythonanywhere.com', '127.0.0.1', 'todo-v1-zhz8.onrender.com']
+ALLOWED_HOSTS = ['158.101.242.116', 'almalkias.pythonanywhere.com', '127.0.0.1', 'todo-v1-zhz8.onrender.com']
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
